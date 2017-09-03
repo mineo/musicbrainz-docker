@@ -18,6 +18,8 @@ services:
       - pgdata:/var/lib/postgresql/data
     expose:
       - "5432"
+    ports:
+      - "5432:5432"
 
   musicbrainz:
     build: musicbrainz-dockerfile
@@ -32,23 +34,23 @@ services:
       - MUSICBRAINZ_USE_PROXY=1
     depends_on:
       - db
-      - search
       - redis
+      - rabbitmq
 
-  indexer:
-    build: indexer-dockerfile
-    depends_on:
-      - db
-    volumes:
-      - indexdata:/home/search/indexdata
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=musicbrainz
+      - RABBITMQ_DEFAULT_USER=musicbrainz
+      - RABBITMQ_DEFAULT_PASS=musicbrainz
 
-  search:
-    build: search-dockerfile
-    restart: unless-stopped
-    expose:
-      - "8080"
-    volumes:
-      - indexdata:/home/search/indexdata
+  solr:
+    image: mine0/musicbrainz-solr:latest
+    ports:
+      - "8983:8983"
 
   redis:
     image: redis:3.2.1

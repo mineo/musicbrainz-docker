@@ -16,11 +16,14 @@ RUN apt-get update && \
     postgresql-server-dev-9.5
 
 RUN git clone https://github.com/metabrainz/postgresql-musicbrainz-unaccent.git /tmp/postgresql-musicbrainz-unaccent && \
-  git clone https://github.com/metabrainz/postgresql-musicbrainz-collate.git /tmp/postgresql-musicbrainz-collate
+  git clone https://github.com/metabrainz/postgresql-musicbrainz-collate.git /tmp/postgresql-musicbrainz-collate && \
+  git clone https://github.com/omniti-labs/pg_amqp.git /tmp/pg_amqp
 
 WORKDIR /tmp/postgresql-musicbrainz-unaccent
 RUN make && make install
 WORKDIR /tmp/postgresql-musicbrainz-collate
+RUN make && make install
+WORKDIR /tmp/pg_amqp
 RUN make && make install
 WORKDIR /
 
